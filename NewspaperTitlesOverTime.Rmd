@@ -1,0 +1,42 @@
+---
+title: "U.S. Newspaper Titles Over Time"
+author: "Ryan Cordell"
+date: "4/30/2018"
+output: html_document
+---
+
+Many of my classes, particularly my graduate [Humanities Data Analysis](http://s17hda.ryancordell.org/) course, introduce students to humanistic applications of text and data analysis. One of the greatest challenges for preparing these classes has been finding or creating useful humanities data sets to analyze: small and manageable enough to work with in the space of a class session, but complex enough to yield results that will help students see the potential for data analyses in relation to research questions they want to answer. Learning [exploratory data analysis](http://r4ds.had.co.nz/exploratory-data-analysis.html), for instance, requires tabular data that can be queried and transformed. In the past I've followed the lead of Lincoln Mullen and Ben Schmidt and used census data for these particular lessons: it's easy to see how investigating and visualizing these historical records might yield insights pertinent to humanities work, and there are enough categories to give us room to explore.
+
+In looking for a second option for those classes, however, I found myself experimenting with the Library of Congress' [U.S. Newspaper Directory](https://chroniclingamerica.loc.gov/search/titles/), which lists all the papers the LoC knows of from 1690 to the present, including basic metadata for each, such as when a given paper was founded and when it ended. In some ways this metadata can be misleading, or at least can highlight the different priorities of library catalogers and humanities researchers. For instance, the LoC creates a new catalog entry each time a newspaper changes its name, even slightly—and newspapers in the nineteenth century changed their names *all the time*. These name changes can signal a new editor, a merger of two papers (or a schism of one), a switch in political affiliation—or they can signal simply that the name was changed to something more current or locally salient. These shifts can be meaningful, but often are not essentially so for a researcher interested in the dynamics of a particular paper over time. In our attempts to map networks of information exchange during the period, for instance, we have found the division of papers into so many distinct units unhelpful, as the network dynamics of a particlar paper often persist through small name changes. Thus we have experimented with various ways of inferring newspaper "families" under which we can group related papers for the purposes of network analysis and related methods.
+
+As I experimented with the U.S. Newspaper Diretory data, however, I began to wonder whether all of those shifting newspaper titles might be collectively meaningful, pointing to larger trends in newspaper naming that would reflect shifts in the medium, or in the medium's imagination of itself, over time. My experiments here are computationally quite simple, focused primarily on word frequencies in newspaper titles over time. I'm not entirely certain there's anything *new* in the analyses below, either, though I'm aware it can be hard to separate [what makes sense from what we already knew](https://matthewlincoln.net/2015/03/21/confabulation-in-the-humanities.html). Ultimatlely, I mostly still think this will be an excellent dataset for the classroom, and some of the analyses below good first steps in teaching students to explore suc ha a dataset.But there are some suggestive trends that, if nothing else, evidence at scale large shifts in how the newspaper thought of itself through the nineteenth-century. 
+
+```{r}
+
+library(tidyverse)
+library(tidytext)
+library(plotly)
+
+```
+
+First we 
+
+papers <- read_csv("./us-newspapers/data/US-Newspapers.csv") %>%
+  select(title, state, city, start, end, frequency, language) %>%
+  filter(start != 9999) %>% 
+  mutate(end = replace(end, end == 9999, 2014)) %>%
+  mutate(startDecade = paste(substring(start, 1,3))) %>%
+  mutate(startDecade = as.numeric(paste(startDecade, 0, sep=""))) %>%
+  mutate(endDecade = paste(substring(end, 1,3))) %>%
+  mutate(endDecade = as.numeric(paste(endDecade, 0, sep=""))) %>%
+  unique()
+
+stopWords <- as_data_frame(c("the", "an", "and", "der", 
+                             "die", "das", "und", "of",
+                             "in","aus","dem","or")) %>%
+  rename(word = value)
+
+```
+
+
+The vocabulary editors drew from in naming their papers can help us understand the work editors and readers saw the newspaper doing. 
